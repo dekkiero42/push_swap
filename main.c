@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dbiletsk <dbiletsk@student.42.fr>          +#+  +:+       +#+        */
+/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/05 15:57:22 by dbiletsk          #+#    #+#             */
-/*   Updated: 2026/01/10 17:51:08 by dbiletsk         ###   ########.fr       */
+/*   Updated: 2026/01/11 21:28:57 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,7 +70,7 @@ int	is_number_in(long *array, int len, long number)
 	return (0);
 }
 
-int	is_arrays_are_same(long *arr1, long *arr2, int len)
+int	is_arrays_are_equal(long *arr1, long *arr2, int len)
 {
 	int	i;
 
@@ -119,11 +119,53 @@ static int	parse_input(long **buffer, int argc, char **argv)
 	i = -1;
 	while (++i < len)
 		*(*buffer + i) = ft_atol(temp[i]);
-	while (--argc)
-		free(temp[argc]);
+	while (i != -1)
+		free(temp[i--]);
 	return (free(temp), len);
 }
+int is_input_valid(int argc , char **argv)
+{
+	int i;
+	
+	if (argc == 2)
+	{
+		if (!is_all_digits(argv[1]))
+			return (printf("Error\n"), 0);
+	}
+	else
+	{
+		i = 1;
+		while(argv[i])
+		{
+			if (!is_all_digits(argv[i++]))
+				return (printf("Error\n"), 0); 
+		}
+	}
+	return 1;
+}
 
+int is_stack_valid(long* stack, int len)
+{
+	long *uniq;
+	int i;
+
+	if (len == 1)
+		return (printf("Already sorted"), 0);
+	// Check for numbers  exceeding limits of int
+	if (!is_array_in_int_range(stack, len))
+		return (printf("Exceeding limits of int"), 0);
+	// Checking for unique numbers
+	uniq = ft_calloc(len, sizeof(long));
+	i = -1;
+	while (++i < len)
+	{
+		if (!is_number_in(uniq, len, stack[i]))
+			uniq[i] = stack[i];
+	}
+	if (!is_arrays_are_equal(stack, uniq, len))
+		return printf("Array are not unique"), 0;
+	return free(uniq), 1;
+}
 int	main(int argc, char **argv)
 {
 	// t_list stack;
@@ -132,48 +174,15 @@ int	main(int argc, char **argv)
 	/*---------------------------------INPUT VALIDATION---------------------------------*/
 	if (argc >= 2)
 	{
-		// Checking for not digits in string
-        if (argc == 2)
-        {
-            if (!is_all_digits(argv[1]))
-			    return (printf("Error\n"), 0);
-        }
-        else
-        {
-            int i = 1;
-            while(argv[i])
-            {
-                if (!is_all_digits(argv[i]))
-			        return (printf("Error\n"), 0); 
-            }
-        }
 		int len;
-		int i;
-        long *uniq;
-
-		i = -1;
+		if (!is_input_valid(argc,argv))
+			return (printf("Input is not valid"), 0);
 		len = parse_input(&stack, argc, argv);
-		if (len == 1)
-			return (free(stack), printf("Already sorted"), 0);
-		// Check for numbers  exceeding limits of int
-		if (!is_array_in_int_range(stack, len))
-			return (free(stack), printf("exceeding limits of int\n"), 0);
-		// Checking for unique numbers
-        uniq = ft_calloc(len, sizeof(long));
-		i = -1;
-		while (++i < len)
-		{
-			if (!is_number_in(uniq, len, stack[i]))
-				uniq[i] = stack[i];
-			ft_printf("%i\n", uniq[i]);
-		}
-		if (is_arrays_are_same(stack, uniq, len))
-			printf("Array are unique");
-		else
-			printf("Array are not unique");
+		if(!is_stack_valid(stack,len))
+			return (free(stack), printf("Stack is not valid"), 0);
+		print_char(len);
+		printf("Stack is ready\n");
 		free(stack);
-		free(uniq);
-
 		/*---------------------------------INPUT VALIDATION END---------------------------------*/
 	}
 

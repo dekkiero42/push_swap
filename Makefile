@@ -17,7 +17,7 @@ test: $(NAME)
 
 
 memory: $(NAME)
-	valgrind  --leak-check=full ./$(NAME) $(TEST_NUMBERS)
+	valgrind  --leak-check=full ./$(NAME) $(TEST_INPUT)
 
 $(LIB):
 	$(MAKE) -C $(LIB_DIR)
