@@ -6,7 +6,7 @@
 /*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/05 15:57:22 by dbiletsk          #+#    #+#             */
-/*   Updated: 2026/01/11 21:28:57 by marvin           ###   ########.fr       */
+/*   Updated: 2026/01/12 23:17:02 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -166,6 +166,56 @@ int is_stack_valid(long* stack, int len)
 		return printf("Array are not unique"), 0;
 	return free(uniq), 1;
 }
+
+void swap(long *a, long *b)
+{
+	long temp;
+
+	temp = *a;
+	*a = *b;
+	*b = temp;
+}
+
+int partition(long *arr, int low , int high)
+{
+	long pivot;
+	int i;
+	int j;
+
+	pivot = arr[high];
+	i = low - 1;
+	j = low;
+	while (j <= high - 1)
+	{
+		if (arr[j] < pivot)
+		{
+			i++;
+			swap(&arr[i], &arr[j]);
+		}
+		j++;
+	}
+	swap(&arr[i+1],&arr[high]);
+	return i + 1;
+}
+
+
+
+// low and high here are bassicly indexex that represent the slice of array ,
+//we ned this two cause we will call it recoursevly
+void quick_sort(long* arr,int low,int high)
+{
+	//This one is here cause we need basecase to leave recursion.
+	//It will fires when recursion would dive so deep that parts have len 1
+	if (low < high)
+	{
+		int pivot_index;
+		
+		pivot_index = partition(arr, low ,high);
+
+		quick_sort(arr,0, pivot_index - 1);
+		quick_sort(arr, pivot_index + 1, high);
+	}
+}
 int	main(int argc, char **argv)
 {
 	// t_list stack;
@@ -182,8 +232,24 @@ int	main(int argc, char **argv)
 			return (free(stack), printf("Stack is not valid"), 0);
 		print_char(len);
 		printf("Stack is ready\n");
-		free(stack);
+		
 		/*---------------------------------INPUT VALIDATION END---------------------------------*/
+		
+		//Cpy stack
+		long *sorted_stack;
+		sorted_stack = ft_calloc(len, sizeof(long));
+		ft_memcpy(sorted_stack,stack,sizeof(long) * len);
+		quick_sort(sorted_stack,0,len - 1);
+		int i = 0;
+		while (i < len)
+		{
+			ft_printf("%d\n",sorted_stack[i++]);
+		}
+
+		
+
+		free(sorted_stack);
+		free(stack);
 	}
 
 	return (0);
