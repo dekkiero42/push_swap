@@ -6,17 +6,17 @@
 /*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/05 15:57:22 by dbiletsk          #+#    #+#             */
-/*   Updated: 2026/01/12 23:17:02 by marvin           ###   ########.fr       */
+/*   Updated: 2026/01/13 20:40:31 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include <libft.h>
 
-// typedef struct s_item
-// {
-//     long value;
-//     int index;
-// }   t_item;
+typedef struct s_item
+{
+    long value;
+    int index;
+}   t_item;
 
 long	ft_atol(const char *str)
 {
@@ -216,6 +216,33 @@ void quick_sort(long* arr,int low,int high)
 		quick_sort(arr, pivot_index + 1, high);
 	}
 }
+
+int binary_search(long *arr,long numb, int low,int high)
+{
+	if (high>=low)
+	{
+		int mid = low +(high - low) / 2;
+		
+		if (arr[mid] == numb)
+			return mid;
+
+		if (arr[mid] > numb)
+		{
+			high = mid -1;
+			return binary_search(arr, numb,low, mid - 1);
+		}
+
+		return 	binary_search(arr, numb,mid + 1,high);
+	}
+
+	return -1;
+}
+
+void print_content(void* content)
+{
+	t_item *temp = (t_item *)content;
+	ft_printf("Element: %d, Index: %d\n",temp->value,temp->index);
+}
 int	main(int argc, char **argv)
 {
 	// t_list stack;
@@ -230,8 +257,7 @@ int	main(int argc, char **argv)
 		len = parse_input(&stack, argc, argv);
 		if(!is_stack_valid(stack,len))
 			return (free(stack), printf("Stack is not valid"), 0);
-		print_char(len);
-		printf("Stack is ready\n");
+		printf("Stack is valid\n");
 		
 		/*---------------------------------INPUT VALIDATION END---------------------------------*/
 		
@@ -241,11 +267,19 @@ int	main(int argc, char **argv)
 		ft_memcpy(sorted_stack,stack,sizeof(long) * len);
 		quick_sort(sorted_stack,0,len - 1);
 		int i = 0;
-		while (i < len)
+		t_list *indexed_lst;
+		while(i < len)
 		{
-			ft_printf("%d\n",sorted_stack[i++]);
+			t_item *temp;
+			temp = ft_calloc(sizeof(t_item),1);
+			temp->value = stack[i];
+			temp->index = binary_search(sorted_stack,stack[i], 0, len - 1);
+			ft_lstadd_back(&indexed_lst,ft_lstnew(temp));
+			i++;
 		}
-
+		ft_lstiter(indexed_lst,print_content);
+		
+		
 		
 
 		free(sorted_stack);
