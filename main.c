@@ -6,7 +6,7 @@
 /*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/05 15:57:22 by dbiletsk          #+#    #+#             */
-/*   Updated: 2026/01/13 20:40:31 by marvin           ###   ########.fr       */
+/*   Updated: 2026/01/18 22:35:32 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -243,6 +243,40 @@ void print_content(void* content)
 	t_item *temp = (t_item *)content;
 	ft_printf("Element: %d, Index: %d\n",temp->value,temp->index);
 }
+
+void s(t_list* stack)
+{
+	t_list *second;
+	t_item *temp;
+
+	second = stack->next;
+
+	if (second == NULL)
+		return;
+	temp = stack->content;
+	stack->content = second->content;
+	second ->content = temp;
+}
+
+void p(t_list** src, t_list** dst)
+{
+	t_list *temp;
+
+	temp = (*src)->next;
+	if (*src == NULL)
+		return;
+	if (*dst == NULL)	
+	{
+		*dst = *src;
+		(*src)->next = NULL;
+	}
+	else
+		ft_lstadd_front(dst,*src);
+	*src = temp; 
+
+
+}
+
 int	main(int argc, char **argv)
 {
 	// t_list stack;
@@ -267,20 +301,30 @@ int	main(int argc, char **argv)
 		ft_memcpy(sorted_stack,stack,sizeof(long) * len);
 		quick_sort(sorted_stack,0,len - 1);
 		int i = 0;
-		t_list *indexed_lst;
+		t_list *stack_a;
+		stack_a = NULL;
+
+		t_list *stack_b;
+		stack_a = NULL;
 		while(i < len)
 		{
 			t_item *temp;
 			temp = ft_calloc(sizeof(t_item),1);
 			temp->value = stack[i];
 			temp->index = binary_search(sorted_stack,stack[i], 0, len - 1);
-			ft_lstadd_back(&indexed_lst,ft_lstnew(temp));
+			ft_lstadd_back(&stack_a,ft_lstnew(temp));
 			i++;
 		}
-		ft_lstiter(indexed_lst,print_content);
 		
+		//s(stack_a);
+		p(&stack_a,&stack_b);
+		p(&stack_a,&stack_b);
 		
-		
+		ft_lstiter(stack_a,print_content);
+		ft_printf("\n");
+		ft_lstiter(stack_b,print_content);
+		ft_lstclear(&stack_a,free);
+		ft_lstclear(&stack_b,free);
 
 		free(sorted_stack);
 		free(stack);
