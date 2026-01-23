@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: dbiletsk <dbiletsk@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/05 15:57:22 by dbiletsk          #+#    #+#             */
-/*   Updated: 2026/01/21 21:13:25 by marvin           ###   ########.fr       */
+/*   Updated: 2026/01/23 19:22:06 by dbiletsk         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -244,17 +244,17 @@ void print_content(void* content)
 	ft_printf("Element: %d, Index: %d\n",temp->value,temp->index);
 }
 
-void s(t_list* stack)
+void s(t_list** stack)
 {
 	t_list *second;
 	t_item *temp;
 
-	second = stack->next;
+	second = (*stack)->next;
 
 	if (second == NULL)
 		return;
-	temp = stack->content;
-	stack->content = second->content;
+	temp = (*stack)->content;
+	(*stack)->content = second->content;
 	second ->content = temp;
 }
 
@@ -304,6 +304,26 @@ void rr(t_list** dst)
 	
 }
 
+int find_elem_by_index(t_list *stack_a,int index)
+{
+	t_list* ptr;
+	t_item* node;
+	int i;
+	
+	i = 0;
+	ptr = stack_a;
+	while(ptr != NULL)
+	{
+		node = (t_item *)ptr->content;
+		if(node->index == index)
+			return i;
+		i++;
+		ptr = ptr->next;
+	}
+	
+	return -1;
+}
+
 int	main(int argc, char **argv)
 {
 	// t_list stack;
@@ -318,9 +338,9 @@ int	main(int argc, char **argv)
 		len = parse_input(&stack, argc, argv);
 		if(!is_stack_valid(stack,len))
 			return (free(stack), printf("Stack is not valid"), 0);
-		printf("Stack is valid\n");
+		//printf("Stack is valid\n");
 		
-		/*---------------------------------INPUT VALIDATION END---------------------------------*/
+	/*---------------------------------INPUT VALIDATION END---------------------------------*/
 		
 		//Cpy stack
 		long *sorted_stack;
@@ -333,6 +353,7 @@ int	main(int argc, char **argv)
 
 		t_list *stack_b;
 		stack_a = NULL;
+		stack_b = NULL;
 		while(i < len)
 		{
 			t_item *temp;
@@ -342,16 +363,45 @@ int	main(int argc, char **argv)
 			ft_lstadd_back(&stack_a,ft_lstnew(temp));
 			i++;
 		}
-		
-		// s(stack_a);
-		// p(&stack_a,&stack_b);
-		// p(&stack_a,&stack_b);
-		rr(&stack_a);
 
-		
+
+
+		/*---------------------------------Algorithm---------------------------------*/
+		//Find smallest number position
+		//Choose direction of rotation
+		//Rotatte it to the top
+		//Push it to b
+		//Repeat until thete is no elems
+		//Push all stack b elems to a
+		i = 0;
+		int pos;
+		while (stack_a)
+		{
+			
+			pos = find_elem_by_index(stack_a, i);
+			if(ft_lstsize(stack_a) - pos <= pos)
+			{
+				while(pos++ != ft_lstsize(stack_a)){
+					//ft_printf("rra\n");
+					rr(&stack_a);}
+			}
+			else
+			{
+				while (pos--){
+					//ft_printf("ra\n");
+					r(&stack_a);
+				}				
+			}
+			//ft_printf("pb\n");
+			p(&stack_a,&stack_b);
+			i++;
+		}
+		while(stack_b){
+			//ft_printf("pa\n");
+			p(&stack_b,&stack_a);
+		}
+
 		ft_lstiter(stack_a,print_content);
-		ft_printf("\n");
-		ft_lstiter(stack_b,print_content);
 		ft_lstclear(&stack_a,free);
 		ft_lstclear(&stack_b,free);
 
