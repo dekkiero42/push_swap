@@ -6,7 +6,7 @@
 /*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/05 15:57:22 by dbiletsk          #+#    #+#             */
-/*   Updated: 2026/01/18 22:35:32 by marvin           ###   ########.fr       */
+/*   Updated: 2026/01/21 21:13:25 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -277,6 +277,33 @@ void p(t_list** src, t_list** dst)
 
 }
 
+void r(t_list** dst)
+{
+	t_list *first;
+	t_list *second;
+
+	first = *dst;
+	second = (*dst)->next;
+	first->next = NULL;
+	*dst = second;
+	ft_lstadd_back(dst,first);
+}
+
+void rr(t_list** dst)
+{
+	size_t i;
+	size_t len = ft_lstsize(*dst);
+
+	t_list *ptr = *dst;
+	i = 0;
+	while (i++ < len - 2)
+		ptr = ptr->next;
+	ft_lstadd_front(dst, ft_lstlast(*dst));
+	
+	ptr->next = NULL;
+	
+}
+
 int	main(int argc, char **argv)
 {
 	// t_list stack;
@@ -316,9 +343,11 @@ int	main(int argc, char **argv)
 			i++;
 		}
 		
-		//s(stack_a);
-		p(&stack_a,&stack_b);
-		p(&stack_a,&stack_b);
+		// s(stack_a);
+		// p(&stack_a,&stack_b);
+		// p(&stack_a,&stack_b);
+		rr(&stack_a);
+
 		
 		ft_lstiter(stack_a,print_content);
 		ft_printf("\n");
