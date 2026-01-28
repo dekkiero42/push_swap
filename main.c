@@ -6,7 +6,7 @@
 /*   By: dbiletsk <dbiletsk@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/05 15:57:22 by dbiletsk          #+#    #+#             */
-/*   Updated: 2026/01/23 19:22:06 by dbiletsk         ###   ########.fr       */
+/*   Updated: 2026/01/28 20:03:32 by dbiletsk         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,8 @@ typedef struct s_item
 {
     long value;
     int index;
+	int  *target_node_index;
+	int price;
 }   t_item;
 
 long	ft_atol(const char *str)
@@ -304,14 +306,14 @@ void rr(t_list** dst)
 	
 }
 
-int find_elem_by_index(t_list *stack_a,int index)
+int find_elem_position_by_index(t_list *stack,int index)
 {
 	t_list* ptr;
 	t_item* node;
 	int i;
 	
 	i = 0;
-	ptr = stack_a;
+	ptr = stack;
 	while(ptr != NULL)
 	{
 		node = (t_item *)ptr->content;
@@ -322,6 +324,61 @@ int find_elem_by_index(t_list *stack_a,int index)
 	}
 	
 	return -1;
+}
+
+void set_target_nodes(t_list* src,t_list *dst)
+{
+	t_item* src_node_item;
+	t_list *ptr_src;
+	t_list *ptr_dst;
+	long temp;
+	long closest;
+	
+	closest = ((t_item *)dst->content)->index;
+	ptr_src = src;
+	while(ptr_src)
+	{
+		//Current node t_item which is needed to compare indexes and to change target node in end
+		src_node_item = (t_item *)ptr_src->content;
+		//Pointer to itterate trought b;
+		ptr_dst = dst;
+		while(ptr_dst)
+		{
+			temp = ((t_item *)dst->content)->index;
+			if ((src_node_item->index < temp ) && (temp< closest))
+			closest = temp;
+			ptr_dst = ptr_dst->next;
+		}
+		src_node_item->target_node_index = closest;
+		ptr_src = ptr_src->next;
+	}
+}
+//src is stack for which node we defining price, dst where we would be moving them
+//Function sets price value in each node of src, price respresen how much operation u should do to transfer node from src on top of target node
+//CALL AFTER TARGET NODES ARE SET 
+void set_price(t_list* src,t_list *dst)
+{
+	t_item* src_node_item;
+	t_list *ptr_a;
+	int node_position;
+	int target_position;
+
+	ptr_a = src;
+	while(ptr_a)
+	{	
+		src_node_item = (t_item *)ptr_a->content;
+		node_position = find_elem_position_by_index(src,src_node_item->index);
+		
+		if (node_position > ft_lstsize(src)/2)
+			node_position = ft_lstsize(src) - node_position;
+
+		target_position = find_elem_position_by_index(dst, src_node_item->target_node_index);
+
+		if (target_position > ft_lstsize(dst)/2)
+			target_position = ft_lstsize(dst) - target_position;
+		src_node_item->price = node_position + target_position;
+		ptr_a = ptr_a->next;
+	}
 }
 
 int	main(int argc, char **argv)
@@ -375,30 +432,22 @@ int	main(int argc, char **argv)
 		//Push all stack b elems to a
 		i = 0;
 		int pos;
-		while (stack_a)
+		while (ft_lstsize(stack_a) >= 3)
 		{
-			
-			pos = find_elem_by_index(stack_a, i);
-			if(ft_lstsize(stack_a) - pos <= pos)
+			if (ft_lstsize(stack_b) >=2)
 			{
-				while(pos++ != ft_lstsize(stack_a)){
-					//ft_printf("rra\n");
-					rr(&stack_a);}
+				set_target_nodes(stack_a,stack_b);
+				set_price(stack_a,stack_b);
+				t_item* cheapest_node = get_lowest_price_context(stack_a);
+				push_node_to_top(stack_a,cheapest_node->index);
+				push_node_to_top(stack_b,cheapest_node->target_node_index);
+				p(stack_a,stack_b);
 			}
 			else
 			{
-				while (pos--){
-					//ft_printf("ra\n");
-					r(&stack_a);
-				}				
+				p(stack_a,stack_b);
+				p(stack_a,stack_b);
 			}
-			//ft_printf("pb\n");
-			p(&stack_a,&stack_b);
-			i++;
-		}
-		while(stack_b){
-			//ft_printf("pa\n");
-			p(&stack_b,&stack_a);
 		}
 
 		ft_lstiter(stack_a,print_content);
