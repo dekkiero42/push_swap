@@ -6,7 +6,7 @@
 /*   By: dbiletsk <dbiletsk@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/05 15:57:22 by dbiletsk          #+#    #+#             */
-/*   Updated: 2026/01/28 20:03:32 by dbiletsk         ###   ########.fr       */
+/*   Updated: 2026/01/29 18:29:46 by dbiletsk         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,8 +16,9 @@ typedef struct s_item
 {
     long value;
     int index;
-	int  *target_node_index;
+	int  target_node_index;
 	int price;
+	int target_price;
 }   t_item;
 
 long	ft_atol(const char *str)
@@ -376,9 +377,53 @@ void set_price(t_list* src,t_list *dst)
 
 		if (target_position > ft_lstsize(dst)/2)
 			target_position = ft_lstsize(dst) - target_position;
-		src_node_item->price = node_position + target_position;
+		src_node_item->price = node_position;
+		src_node_item->target_price = target_position;
 		ptr_a = ptr_a->next;
 	}
+}
+
+t_item *get_lowest_price_node_context(t_list *stack_a)
+{
+	t_list* ptr;
+	t_item* lowest;
+	t_item* node;
+	int lowest_price;
+	int node_price;
+	
+	ptr = stack_a;
+	lowest = (t_item *)ptr->content;
+	lowest_price = lowest->price + lowest->target_price;
+	ptr = ptr->next;
+	while (ptr)
+	{
+		node = (t_item *)ptr->content;
+		node_price = node->price + node->target_price;
+		if (node_price < lowest_price)
+		{
+			lowest = node;
+			lowest_price = node_price;
+		}
+		ptr = ptr->next;
+	}
+	return (lowest);
+}
+
+void push_node_to_top(t_list *stack,int index)
+{
+	int pos;
+
+	pos = find_elem_position_by_index(stack,index);
+	if (pos > ft_lstsize(stack)/2)
+	{
+		pos = ft_lstsize(stack) - pos;
+		//MAYBE HERE WILL BE A BAG
+		while(pos--)
+			rr(&stack);
+	}
+	//MAYBE HERE WILL BE A BAG
+	while(pos--)
+			r(&stack);
 }
 
 int	main(int argc, char **argv)
@@ -431,26 +476,26 @@ int	main(int argc, char **argv)
 		//Repeat until thete is no elems
 		//Push all stack b elems to a
 		i = 0;
-		int pos;
-		while (ft_lstsize(stack_a) >= 3)
+		while (ft_lstsize(stack_a) > 3)
 		{
 			if (ft_lstsize(stack_b) >=2)
 			{
 				set_target_nodes(stack_a,stack_b);
 				set_price(stack_a,stack_b);
-				t_item* cheapest_node = get_lowest_price_context(stack_a);
+				t_item* cheapest_node = get_lowest_price_node_context(stack_a);
 				push_node_to_top(stack_a,cheapest_node->index);
 				push_node_to_top(stack_b,cheapest_node->target_node_index);
-				p(stack_a,stack_b);
+				p(&stack_a,&stack_b);
 			}
 			else
 			{
-				p(stack_a,stack_b);
-				p(stack_a,stack_b);
+				p(&stack_a,&stack_b);
+				p(&stack_a,&stack_b);
 			}
 		}
 
-		ft_lstiter(stack_a,print_content);
+		//ft_lstiter(stack_a,print_content);
+		ft_lstiter(stack_b,print_content);
 		ft_lstclear(&stack_a,free);
 		ft_lstclear(&stack_b,free);
 
