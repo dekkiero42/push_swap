@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
+/*   By: dbiletsk <dbiletsk@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/05 15:57:22 by dbiletsk          #+#    #+#             */
-/*   Updated: 2026/02/01 11:38:02 by marvin           ###   ########.fr       */
+/*   Updated: 2026/02/01 19:24:16 by dbiletsk         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -220,10 +220,12 @@ void print_content(void* content)
 	t_item *temp = (t_item *)content;
 	ft_printf("Element: %d, Index: %d\n",temp->value,temp->index);
 }
-void s(t_list** stack)
+void s(t_list** stack, char c)
 {
 	t_list *second;
 	t_item *temp;
+
+	ft_printf("s%c\n", c);
 	second = (*stack)->next;
 	if (second == NULL)
 		return;
@@ -231,9 +233,11 @@ void s(t_list** stack)
 	(*stack)->content = second->content;
 	second ->content = temp;
 }
-void p(t_list** src, t_list** dst)
+void p(t_list** src, t_list** dst, char c)
 {
 	t_list *temp;
+
+	ft_printf("p%c\n", c);
 	if (*src == NULL)
 		return;
 	temp = (*src)->next;
@@ -246,21 +250,25 @@ void p(t_list** src, t_list** dst)
 		ft_lstadd_front(dst,*src);
 	*src = temp; 
 }
-void r(t_list** dst)
+void r(t_list** dst, char c)
 {
 	t_list *first;
 	t_list *second;
+
+	ft_printf("r%c\n", c);
 	first = *dst;
 	second = (*dst)->next;
 	first->next = NULL;
 	*dst = second;
 	ft_lstadd_back(dst,first);
 }
-void rr(t_list** dst)
+void rr(t_list** dst, char c)
 {
 	size_t i;
 	size_t len = ft_lstsize(*dst);
 	t_list *ptr = *dst;
+	
+	ft_printf("rr%c\n", c);
 	i = 0;
 	while (i++ < len - 2)
 		ptr = ptr->next;
@@ -295,6 +303,7 @@ void set_target_nodes(t_list* src,t_list *dst)
 	t_list *ptr_dst;
 	long temp;
 	long closest;
+
 	if (dst == NULL)
 		return;
 	ptr_src = src;
@@ -304,15 +313,15 @@ void set_target_nodes(t_list* src,t_list *dst)
 		ptr_dst = dst;
 		closest = -1;
 		while (ptr_dst)
-	{
-		temp = ((t_item *)ptr_dst->content)->index;
-		if (temp > src_node_item->index)
 		{
-			if (closest == -1 || temp < closest)
-			closest = temp;
+			temp = ((t_item *)ptr_dst->content)->index;
+			if (temp > src_node_item->index)
+			{
+				if (closest == -1 || temp < closest)
+				closest = temp;
+			}
+			ptr_dst = ptr_dst->next;
 		}
-		ptr_dst = ptr_dst->next;
-	}
 	if (closest == -1)
 	{
 		ptr_dst = dst;
@@ -379,7 +388,7 @@ t_item *get_lowest_price_node_context(t_list *stack_a)
 	}
 	return (lowest);
 }
-void push_node_to_top(t_list **stack,int index)
+void push_node_to_top(t_list **stack,int index,char c)
 {
 	int pos;
 	pos = find_elem_position_by_index(*stack,index);
@@ -388,14 +397,14 @@ void push_node_to_top(t_list **stack,int index)
 		pos = ft_lstsize(*stack) - pos;
 		//MAYBE HERE WILL BE A BAG
 		while(pos--)
-			rr(stack);
+			rr(stack, c);
 		return ;
 	}
 	//MAYBE HERE WILL BE A BAG
 	while(pos--)
-			r(stack);
+			r(stack,c);
 }
-void tiny_sort(t_list **stack)
+void tiny_sort(t_list **stack, char c)
 {
 	int first;
 	int second;
@@ -404,34 +413,34 @@ void tiny_sort(t_list **stack)
 	second = ((t_item *)(*stack)->next->content)->index;
 	third = ((t_item *)(*stack)->next->next->content)->index;
 	if (first > second && first < third && second < third)
-		s(stack);
+		s(stack,c);
 	else if (first > second && first > third && second > third)
 	{
-		s(stack);
-		rr(stack);
+		s(stack,c);
+		rr(stack,c);
 	}
 	else if (first > second && first > third && second < third)
-		r(stack);
+		r(stack,c);
 	else if (first < second && first < third && second > third)
 	{
-		s(stack);
-		r(stack);
+		s(stack,c);
+		r(stack,c);
 	}
 	else if (first < second && first > third && second > third)
-		rr(stack); 
+		rr(stack,c); 
 }
-void move_cheapest_node(t_list **stack_src, t_list **stack_dst)
+void move_cheapest_node(t_list **stack_src, t_list **stack_dst,char src,char dst)
 {
-	t_item*cheapest_node;
+	t_item* cheapest_node;
 	
 	set_target_nodes(*stack_src, *stack_dst);
 	
 	set_price(*stack_src, *stack_dst);
 	
 	cheapest_node = get_lowest_price_node_context(*stack_src);
-	push_node_to_top(stack_src, cheapest_node->index);
-	push_node_to_top(stack_dst, cheapest_node->target_node_index);
-	p(stack_src, stack_dst);
+	push_node_to_top(stack_src, cheapest_node->index ,src);
+	push_node_to_top(stack_dst, cheapest_node->target_node_index,dst);
+	p(stack_src, stack_dst, dst);
 }
 int is_sorted(t_list *stack)
 {
@@ -447,103 +456,92 @@ int is_sorted(t_list *stack)
 			return 0;
 		ptr = ptr->next;
 	}
-	ft_printf("Stack is sorted\n");
+	//ft_printf("Stack is sorted\n");
 	return (1);
 }
-void turk_sort(t_list **stack_src, t_list **stack_dst)
+void turk_sort(t_list **stack_a, t_list **stack_b)
 {
-	static int iteration = 0;
-	iteration++;
-	ft_printf("----TURK SORT ITERATION %d----\n",iteration);
-	ft_printf("\nSTACK A: \n\n");
-	ft_lstiter(*stack_src,print_content);
-	ft_printf("\nSTACK B: \n\n");
-	ft_lstiter(*stack_dst,print_content);
-	
-	if (ft_lstsize(*stack_dst) < 2)
+	if (ft_lstsize(*stack_b) < 2)
 	{
-		p(stack_src,stack_dst);
-		p(stack_src,stack_dst);
+		p(stack_a,stack_b,'b');
+		p(stack_a,stack_b,'b');
 	}
-	while (ft_lstsize(*stack_src) > 3)
+	while (ft_lstsize(*stack_a) > 3)
 	{
-		move_cheapest_node(stack_src,stack_dst);
+		move_cheapest_node(stack_a,stack_b,'a','b');
 	}	
-	tiny_sort(stack_src);
-	while(*stack_dst)
+	tiny_sort(stack_a, 'a');
+	while(*stack_b)
 	{	
-		move_cheapest_node(stack_dst,stack_src);
+		move_cheapest_node(stack_b,stack_a,'b','a');
 	}
-	push_node_to_top(stack_src, 0);
+	push_node_to_top(stack_a, 0,'a');
 }
+void populate_stack_a(long *stack, long len, t_list **stack_a)
+{
+	long *sorted_stack;
 
+	sorted_stack = ft_calloc(len, sizeof(long));
+	ft_memcpy(sorted_stack,stack,sizeof(long) * len);
+	quick_sort(sorted_stack,0,len - 1);
+
+	int i = 0;
+	while(i < len)
+	{
+		t_item *temp;
+		temp = ft_calloc(sizeof(t_item),1);
+		temp->value = stack[i];
+		temp->index = binary_search(sorted_stack,stack[i], 0, len - 1);
+		ft_lstadd_back(stack_a,ft_lstnew(temp));
+		i++;
+	}
+	free(stack);
+	free(sorted_stack);
+}
 
 int	main(int argc, char **argv)
 {
 	// t_list stack;
-    long *stack;
-    stack = NULL;
+    long *temp;
+	t_list *stack_a;
+	t_list *stack_b;
+	
+    temp = NULL;
 	/*---------------------------------INPUT VALIDATION---------------------------------*/
 	if (argc >= 2)
 	{
 		int len;
 		if (!is_input_valid(argc,argv))
-			return (printf("Input is not valid"), 0);
-		len = parse_input(&stack, argc, argv);
-		if(!is_stack_valid(stack,len))
-			return (free(stack), printf("Stack is not valid"), 0);
+			return (printf("Error\n"), 0);
+		len = parse_input(&temp, argc, argv);
+		if(!is_stack_valid(temp,len))
+			return (free(temp), printf("Error\n"), 0);
 		//printf("Stack is valid\n");
 		
 	/*---------------------------------INPUT VALIDATION END---------------------------------*/
-		
-		//Cpy stack
-		long *sorted_stack;
-		sorted_stack = ft_calloc(len, sizeof(long));
-		ft_memcpy(sorted_stack,stack,sizeof(long) * len);
-		quick_sort(sorted_stack,0,len - 1);
-		int i = 0;
-		t_list *stack_a;
-		stack_a = NULL;
-		t_list *stack_b;
+
 		stack_a = NULL;
 		stack_b = NULL;
-		while(i < len)
-		{
-			t_item *temp;
-			temp = ft_calloc(sizeof(t_item),1);
-			temp->value = stack[i];
-			temp->index = binary_search(sorted_stack,stack[i], 0, len - 1);
-			ft_lstadd_back(&stack_a,ft_lstnew(temp));
-			i++;
-		}
-
-		
-		
+		populate_stack_a(temp,len,&stack_a);
 		
 		/*---------------------------------Algorithm---------------------------------*/
 		if(ft_lstsize(stack_a) == 2 && !is_sorted(stack_a))
 		{
-			ft_printf("sa\n");
-			s(&stack_a);
+			s(&stack_a,'a');
 		}
 		else if (ft_lstsize(stack_a) == 3)
-			tiny_sort(&stack_a);
+			tiny_sort(&stack_a,'a');
 		else
 		{
 			while (!is_sorted(stack_a))
 				turk_sort(&stack_a, &stack_b);
 		}
 
-		ft_printf("\nSTACK A: \n\n");
-		ft_lstiter(stack_a,print_content);
-		ft_printf("\nSTACK B: \n\n");
-		ft_lstiter(stack_b,print_content);
 		/*---------------------------------Algorithm END---------------------------------*/
-		ft_lstiter(stack_b,print_content);
 		ft_lstclear(&stack_a,free);
 		ft_lstclear(&stack_b,free);
-		free(sorted_stack);
-		free(stack);
+		
+		
 	}
 	return (0);
 }
