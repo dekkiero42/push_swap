@@ -3,14 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: dbiletsk <dbiletsk@student.42.fr>          +#+  +:+       +#+        */
+/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/05 15:57:22 by dbiletsk          #+#    #+#             */
-/*   Updated: 2026/01/29 18:29:46 by dbiletsk         ###   ########.fr       */
+/*   Updated: 2026/02/01 11:38:02 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <libft.h>
+#include "libft.h"
 
 typedef struct s_item
 {
@@ -20,13 +20,11 @@ typedef struct s_item
 	int price;
 	int target_price;
 }   t_item;
-
 long	ft_atol(const char *str)
 {
 	long	result;
 	int		sign;
 	int		i;
-
 	result = 0;
 	sign = 1;
 	i = 0;
@@ -45,11 +43,9 @@ long	ft_atol(const char *str)
 	}
 	return (result * sign);
 }
-
 int	is_all_digits(char *s)
 {
 	char	*ptr;
-
 	ptr = s;
 	while (*ptr)
 	{
@@ -59,11 +55,9 @@ int	is_all_digits(char *s)
 	}
 	return (1);
 }
-
 int	is_number_in(long *array, int len, long number)
 {
 	int	i;
-
 	i = -1;
 	while (++i < len)
 	{
@@ -72,11 +66,9 @@ int	is_number_in(long *array, int len, long number)
 	}
 	return (0);
 }
-
 int	is_arrays_are_equal(long *arr1, long *arr2, int len)
 {
 	int	i;
-
 	i = -1;
 	while (++i < len)
 	{
@@ -88,7 +80,6 @@ int	is_arrays_are_equal(long *arr1, long *arr2, int len)
 int	is_array_in_int_range(long *arr, int len)
 {
 	int	i;
-
 	i = -1;
 	while (++i < len)
 	{
@@ -97,13 +88,11 @@ int	is_array_in_int_range(long *arr, int len)
 	}
 	return (1);
 }
-
 static int	parse_input(long **buffer, int argc, char **argv)
 {
 	int		i;
 	char	**temp;
 	int		len;
-
 	len = 0;
 	i = -1;
 	if (argc > 2)
@@ -146,12 +135,10 @@ int is_input_valid(int argc , char **argv)
 	}
 	return 1;
 }
-
 int is_stack_valid(long* stack, int len)
 {
 	long *uniq;
 	int i;
-
 	if (len == 1)
 		return (printf("Already sorted"), 0);
 	// Check for numbers  exceeding limits of int
@@ -169,22 +156,18 @@ int is_stack_valid(long* stack, int len)
 		return printf("Array are not unique"), 0;
 	return free(uniq), 1;
 }
-
 void swap(long *a, long *b)
 {
 	long temp;
-
 	temp = *a;
 	*a = *b;
 	*b = temp;
 }
-
 int partition(long *arr, int low , int high)
 {
 	long pivot;
 	int i;
 	int j;
-
 	pivot = arr[high];
 	i = low - 1;
 	j = low;
@@ -200,9 +183,6 @@ int partition(long *arr, int low , int high)
 	swap(&arr[i+1],&arr[high]);
 	return i + 1;
 }
-
-
-
 // low and high here are bassicly indexex that represent the slice of array ,
 //we ned this two cause we will call it recoursevly
 void quick_sort(long* arr,int low,int high)
@@ -214,12 +194,10 @@ void quick_sort(long* arr,int low,int high)
 		int pivot_index;
 		
 		pivot_index = partition(arr, low ,high);
-
-		quick_sort(arr,0, pivot_index - 1);
+		quick_sort(arr,low,pivot_index - 1);
 		quick_sort(arr, pivot_index + 1, high);
 	}
 }
-
 int binary_search(long *arr,long numb, int low,int high)
 {
 	if (high>=low)
@@ -228,46 +206,37 @@ int binary_search(long *arr,long numb, int low,int high)
 		
 		if (arr[mid] == numb)
 			return mid;
-
 		if (arr[mid] > numb)
 		{
 			high = mid -1;
 			return binary_search(arr, numb,low, mid - 1);
 		}
-
 		return 	binary_search(arr, numb,mid + 1,high);
 	}
-
 	return -1;
 }
-
 void print_content(void* content)
 {
 	t_item *temp = (t_item *)content;
 	ft_printf("Element: %d, Index: %d\n",temp->value,temp->index);
 }
-
 void s(t_list** stack)
 {
 	t_list *second;
 	t_item *temp;
-
 	second = (*stack)->next;
-
 	if (second == NULL)
 		return;
 	temp = (*stack)->content;
 	(*stack)->content = second->content;
 	second ->content = temp;
 }
-
 void p(t_list** src, t_list** dst)
 {
 	t_list *temp;
-
-	temp = (*src)->next;
 	if (*src == NULL)
 		return;
+	temp = (*src)->next;
 	if (*dst == NULL)	
 	{
 		*dst = *src;
@@ -276,27 +245,21 @@ void p(t_list** src, t_list** dst)
 	else
 		ft_lstadd_front(dst,*src);
 	*src = temp; 
-
-
 }
-
 void r(t_list** dst)
 {
 	t_list *first;
 	t_list *second;
-
 	first = *dst;
 	second = (*dst)->next;
 	first->next = NULL;
 	*dst = second;
 	ft_lstadd_back(dst,first);
 }
-
 void rr(t_list** dst)
 {
 	size_t i;
 	size_t len = ft_lstsize(*dst);
-
 	t_list *ptr = *dst;
 	i = 0;
 	while (i++ < len - 2)
@@ -306,7 +269,6 @@ void rr(t_list** dst)
 	ptr->next = NULL;
 	
 }
-
 int find_elem_position_by_index(t_list *stack,int index)
 {
 	t_list* ptr;
@@ -326,7 +288,6 @@ int find_elem_position_by_index(t_list *stack,int index)
 	
 	return -1;
 }
-
 void set_target_nodes(t_list* src,t_list *dst)
 {
 	t_item* src_node_item;
@@ -334,24 +295,38 @@ void set_target_nodes(t_list* src,t_list *dst)
 	t_list *ptr_dst;
 	long temp;
 	long closest;
-	
-	closest = ((t_item *)dst->content)->index;
+	if (dst == NULL)
+		return;
 	ptr_src = src;
-	while(ptr_src)
+	while (ptr_src)
 	{
-		//Current node t_item which is needed to compare indexes and to change target node in end
 		src_node_item = (t_item *)ptr_src->content;
-		//Pointer to itterate trought b;
 		ptr_dst = dst;
-		while(ptr_dst)
+		closest = -1;
+		while (ptr_dst)
+	{
+		temp = ((t_item *)ptr_dst->content)->index;
+		if (temp > src_node_item->index)
 		{
-			temp = ((t_item *)dst->content)->index;
-			if ((src_node_item->index < temp ) && (temp< closest))
+			if (closest == -1 || temp < closest)
+			closest = temp;
+		}
+		ptr_dst = ptr_dst->next;
+	}
+	if (closest == -1)
+	{
+		ptr_dst = dst;
+		closest = ((t_item *)ptr_dst->content)->index;
+		while (ptr_dst)
+		{
+			temp = ((t_item *)ptr_dst->content)->index;
+			if (temp < closest)
 			closest = temp;
 			ptr_dst = ptr_dst->next;
 		}
-		src_node_item->target_node_index = closest;
-		ptr_src = ptr_src->next;
+	}
+	src_node_item->target_node_index = closest;
+	ptr_src = ptr_src->next;
 	}
 }
 //src is stack for which node we defining price, dst where we would be moving them
@@ -363,7 +338,6 @@ void set_price(t_list* src,t_list *dst)
 	t_list *ptr_a;
 	int node_position;
 	int target_position;
-
 	ptr_a = src;
 	while(ptr_a)
 	{	
@@ -372,9 +346,7 @@ void set_price(t_list* src,t_list *dst)
 		
 		if (node_position > ft_lstsize(src)/2)
 			node_position = ft_lstsize(src) - node_position;
-
 		target_position = find_elem_position_by_index(dst, src_node_item->target_node_index);
-
 		if (target_position > ft_lstsize(dst)/2)
 			target_position = ft_lstsize(dst) - target_position;
 		src_node_item->price = node_position;
@@ -382,7 +354,6 @@ void set_price(t_list* src,t_list *dst)
 		ptr_a = ptr_a->next;
 	}
 }
-
 t_item *get_lowest_price_node_context(t_list *stack_a)
 {
 	t_list* ptr;
@@ -408,23 +379,104 @@ t_item *get_lowest_price_node_context(t_list *stack_a)
 	}
 	return (lowest);
 }
-
-void push_node_to_top(t_list *stack,int index)
+void push_node_to_top(t_list **stack,int index)
 {
 	int pos;
-
-	pos = find_elem_position_by_index(stack,index);
-	if (pos > ft_lstsize(stack)/2)
+	pos = find_elem_position_by_index(*stack,index);
+	if (pos > ft_lstsize(*stack)/2)
 	{
-		pos = ft_lstsize(stack) - pos;
+		pos = ft_lstsize(*stack) - pos;
 		//MAYBE HERE WILL BE A BAG
 		while(pos--)
-			rr(&stack);
+			rr(stack);
+		return ;
 	}
 	//MAYBE HERE WILL BE A BAG
 	while(pos--)
-			r(&stack);
+			r(stack);
 }
+void tiny_sort(t_list **stack)
+{
+	int first;
+	int second;
+	int third;
+	first = ((t_item *)(*stack)->content)->index;
+	second = ((t_item *)(*stack)->next->content)->index;
+	third = ((t_item *)(*stack)->next->next->content)->index;
+	if (first > second && first < third && second < third)
+		s(stack);
+	else if (first > second && first > third && second > third)
+	{
+		s(stack);
+		rr(stack);
+	}
+	else if (first > second && first > third && second < third)
+		r(stack);
+	else if (first < second && first < third && second > third)
+	{
+		s(stack);
+		r(stack);
+	}
+	else if (first < second && first > third && second > third)
+		rr(stack); 
+}
+void move_cheapest_node(t_list **stack_src, t_list **stack_dst)
+{
+	t_item*cheapest_node;
+	
+	set_target_nodes(*stack_src, *stack_dst);
+	
+	set_price(*stack_src, *stack_dst);
+	
+	cheapest_node = get_lowest_price_node_context(*stack_src);
+	push_node_to_top(stack_src, cheapest_node->index);
+	push_node_to_top(stack_dst, cheapest_node->target_node_index);
+	p(stack_src, stack_dst);
+}
+int is_sorted(t_list *stack)
+{
+	t_list *ptr;
+	t_item *current;
+	t_item *next;
+	ptr = stack;
+	while (ptr && ptr->next)
+	{
+		current = (t_item *)ptr->content;
+		next = (t_item *)ptr->next->content;
+		if (current->index > next->index)
+			return 0;
+		ptr = ptr->next;
+	}
+	ft_printf("Stack is sorted\n");
+	return (1);
+}
+void turk_sort(t_list **stack_src, t_list **stack_dst)
+{
+	static int iteration = 0;
+	iteration++;
+	ft_printf("----TURK SORT ITERATION %d----\n",iteration);
+	ft_printf("\nSTACK A: \n\n");
+	ft_lstiter(*stack_src,print_content);
+	ft_printf("\nSTACK B: \n\n");
+	ft_lstiter(*stack_dst,print_content);
+	
+	if (ft_lstsize(*stack_dst) < 2)
+	{
+		p(stack_src,stack_dst);
+		p(stack_src,stack_dst);
+	}
+	while (ft_lstsize(*stack_src) > 3)
+	{
+		move_cheapest_node(stack_src,stack_dst);
+	}	
+	tiny_sort(stack_src);
+	while(*stack_dst)
+	{	
+		move_cheapest_node(stack_dst,stack_src);
+	}
+	push_node_to_top(stack_src, 0);
+}
+
 
 int	main(int argc, char **argv)
 {
@@ -452,7 +504,6 @@ int	main(int argc, char **argv)
 		int i = 0;
 		t_list *stack_a;
 		stack_a = NULL;
-
 		t_list *stack_b;
 		stack_a = NULL;
 		stack_b = NULL;
@@ -466,42 +517,33 @@ int	main(int argc, char **argv)
 			i++;
 		}
 
-
-
+		
+		
+		
 		/*---------------------------------Algorithm---------------------------------*/
-		//Find smallest number position
-		//Choose direction of rotation
-		//Rotatte it to the top
-		//Push it to b
-		//Repeat until thete is no elems
-		//Push all stack b elems to a
-		i = 0;
-		while (ft_lstsize(stack_a) > 3)
+		if(ft_lstsize(stack_a) == 2 && !is_sorted(stack_a))
 		{
-			if (ft_lstsize(stack_b) >=2)
-			{
-				set_target_nodes(stack_a,stack_b);
-				set_price(stack_a,stack_b);
-				t_item* cheapest_node = get_lowest_price_node_context(stack_a);
-				push_node_to_top(stack_a,cheapest_node->index);
-				push_node_to_top(stack_b,cheapest_node->target_node_index);
-				p(&stack_a,&stack_b);
-			}
-			else
-			{
-				p(&stack_a,&stack_b);
-				p(&stack_a,&stack_b);
-			}
+			ft_printf("sa\n");
+			s(&stack_a);
+		}
+		else if (ft_lstsize(stack_a) == 3)
+			tiny_sort(&stack_a);
+		else
+		{
+			while (!is_sorted(stack_a))
+				turk_sort(&stack_a, &stack_b);
 		}
 
-		//ft_lstiter(stack_a,print_content);
+		ft_printf("\nSTACK A: \n\n");
+		ft_lstiter(stack_a,print_content);
+		ft_printf("\nSTACK B: \n\n");
+		ft_lstiter(stack_b,print_content);
+		/*---------------------------------Algorithm END---------------------------------*/
 		ft_lstiter(stack_b,print_content);
 		ft_lstclear(&stack_a,free);
 		ft_lstclear(&stack_b,free);
-
 		free(sorted_stack);
 		free(stack);
 	}
-
 	return (0);
 }
