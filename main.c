@@ -6,20 +6,12 @@
 /*   By: dbiletsk <dbiletsk@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/05 15:57:22 by dbiletsk          #+#    #+#             */
-/*   Updated: 2026/02/01 19:24:16 by dbiletsk         ###   ########.fr       */
+/*   Updated: 2026/02/03 19:38:33 by dbiletsk         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libft.h"
+#include "push_swamp.h"
 
-typedef struct s_item
-{
-    long value;
-    int index;
-	int  target_node_index;
-	int price;
-	int target_price;
-}   t_item;
 long	ft_atol(const char *str)
 {
 	long	result;
@@ -122,7 +114,7 @@ int is_input_valid(int argc , char **argv)
 	if (argc == 2)
 	{
 		if (!is_all_digits(argv[1]))
-			return (printf("Error\n"), 0);
+			return (ft_printf("Error\n"), 0);
 	}
 	else
 	{
@@ -130,7 +122,7 @@ int is_input_valid(int argc , char **argv)
 		while(argv[i])
 		{
 			if (!is_all_digits(argv[i++]))
-				return (printf("Error\n"), 0); 
+				return (ft_printf("Error\n"), 0); 
 		}
 	}
 	return 1;
@@ -140,11 +132,9 @@ int is_stack_valid(long* stack, int len)
 	long *uniq;
 	int i;
 	if (len == 1)
-		return (printf("Already sorted"), 0);
-	// Check for numbers  exceeding limits of int
+		return (ft_printf("Already sorted"), 0);
 	if (!is_array_in_int_range(stack, len))
-		return (printf("Exceeding limits of int"), 0);
-	// Checking for unique numbers
+		return (0);
 	uniq = ft_calloc(len, sizeof(long));
 	i = -1;
 	while (++i < len)
@@ -153,7 +143,7 @@ int is_stack_valid(long* stack, int len)
 			uniq[i] = stack[i];
 	}
 	if (!is_arrays_are_equal(stack, uniq, len))
-		return printf("Array are not unique"), 0;
+		return 0;
 	return free(uniq), 1;
 }
 void swap(long *a, long *b)
@@ -183,12 +173,8 @@ int partition(long *arr, int low , int high)
 	swap(&arr[i+1],&arr[high]);
 	return i + 1;
 }
-// low and high here are bassicly indexex that represent the slice of array ,
-//we ned this two cause we will call it recoursevly
 void quick_sort(long* arr,int low,int high)
 {
-	//This one is here cause we need basecase to leave recursion.
-	//It will fires when recursion would dive so deep that parts have len 1
 	if (low < high)
 	{
 		int pivot_index;
@@ -330,7 +316,7 @@ void set_target_nodes(t_list* src,t_list *dst)
 		{
 			temp = ((t_item *)ptr_dst->content)->index;
 			if (temp < closest)
-			closest = temp;
+				closest = temp;
 			ptr_dst = ptr_dst->next;
 		}
 	}
@@ -338,9 +324,7 @@ void set_target_nodes(t_list* src,t_list *dst)
 	ptr_src = ptr_src->next;
 	}
 }
-//src is stack for which node we defining price, dst where we would be moving them
-//Function sets price value in each node of src, price respresen how much operation u should do to transfer node from src on top of target node
-//CALL AFTER TARGET NODES ARE SET 
+
 void set_price(t_list* src,t_list *dst)
 {
 	t_item* src_node_item;
@@ -395,12 +379,10 @@ void push_node_to_top(t_list **stack,int index,char c)
 	if (pos > ft_lstsize(*stack)/2)
 	{
 		pos = ft_lstsize(*stack) - pos;
-		//MAYBE HERE WILL BE A BAG
 		while(pos--)
 			rr(stack, c);
 		return ;
 	}
-	//MAYBE HERE WILL BE A BAG
 	while(pos--)
 			r(stack,c);
 }
@@ -456,7 +438,6 @@ int is_sorted(t_list *stack)
 			return 0;
 		ptr = ptr->next;
 	}
-	//ft_printf("Stack is sorted\n");
 	return (1);
 }
 void turk_sort(t_list **stack_a, t_list **stack_b)
@@ -499,49 +480,42 @@ void populate_stack_a(long *stack, long len, t_list **stack_a)
 	free(sorted_stack);
 }
 
+static void sort_stack(t_list **stack_a,t_list **stack_b) 
+{
+
+	if(ft_lstsize(*stack_a) == 2 && !is_sorted(*stack_a))
+		s(stack_a,'a');
+	else if (ft_lstsize(*stack_a) == 3)
+		tiny_sort(stack_a,'a');
+	else
+	{
+		while (!is_sorted(*stack_a))
+			turk_sort(stack_a, stack_b);
+	}
+}
+
 int	main(int argc, char **argv)
 {
-	// t_list stack;
     long *temp;
 	t_list *stack_a;
 	t_list *stack_b;
+	int len;
 	
     temp = NULL;
-	/*---------------------------------INPUT VALIDATION---------------------------------*/
+	stack_a = NULL;
+	stack_b = NULL;
 	if (argc >= 2)
 	{
-		int len;
 		if (!is_input_valid(argc,argv))
-			return (printf("Error\n"), 0);
+			return (ft_printf("Error\n"), 0);
 		len = parse_input(&temp, argc, argv);
 		if(!is_stack_valid(temp,len))
-			return (free(temp), printf("Error\n"), 0);
-		//printf("Stack is valid\n");
-		
-	/*---------------------------------INPUT VALIDATION END---------------------------------*/
+			return (free(temp), ft_printf("Error\n"), 0);
 
-		stack_a = NULL;
-		stack_b = NULL;
 		populate_stack_a(temp,len,&stack_a);
-		
-		/*---------------------------------Algorithm---------------------------------*/
-		if(ft_lstsize(stack_a) == 2 && !is_sorted(stack_a))
-		{
-			s(&stack_a,'a');
-		}
-		else if (ft_lstsize(stack_a) == 3)
-			tiny_sort(&stack_a,'a');
-		else
-		{
-			while (!is_sorted(stack_a))
-				turk_sort(&stack_a, &stack_b);
-		}
-
-		/*---------------------------------Algorithm END---------------------------------*/
+		sort_stack(&stack_a,&stack_b);
 		ft_lstclear(&stack_a,free);
 		ft_lstclear(&stack_b,free);
-		
-		
 	}
 	return (0);
 }
