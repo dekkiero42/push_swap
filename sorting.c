@@ -12,19 +12,21 @@
 
 #include "push_swamp.h"
 
-void swap(long *a, long *b)
+void	swap(long *a, long *b)
 {
-	long temp;
+	long	temp;
+
 	temp = *a;
 	*a = *b;
 	*b = temp;
 }
 
-int partition(long *arr, int low , int high)
+int	partition(long *arr, int low, int high)
 {
-	long pivot;
-	int i;
-	int j;
+	long	pivot;
+	int		i;
+	int		j;
+
 	pivot = arr[high];
 	i = low - 1;
 	j = low;
@@ -37,62 +39,64 @@ int partition(long *arr, int low , int high)
 		}
 		j++;
 	}
-	swap(&arr[i+1],&arr[high]);
-	return i + 1;
+	swap(&arr[i + 1], &arr[high]);
+	return (i + 1);
 }
 
-void quick_sort(long* arr,int low,int high)
+void	quick_sort(long *arr, int low, int high)
 {
+	int	pivot_index;
+
 	if (low < high)
 	{
-		int pivot_index;
-		
-		pivot_index = partition(arr, low ,high);
-		quick_sort(arr,low,pivot_index - 1);
+		pivot_index = partition(arr, low, high);
+		quick_sort(arr, low, pivot_index - 1);
 		quick_sort(arr, pivot_index + 1, high);
 	}
 }
 
-int binary_search(long *arr,long numb, int low,int high)
+int	binary_search(long *arr, long numb, int low, int high)
 {
-	if (high>=low)
+	int	mid;
+
+	if (high >= low)
 	{
-		int mid = low +(high - low) / 2;
-		
+		mid = low + (high - low) / 2;
 		if (arr[mid] == numb)
-			return mid;
+			return (mid);
 		if (arr[mid] > numb)
 		{
-			high = mid -1;
-			return binary_search(arr, numb,low, mid - 1);
+			high = mid - 1;
+			return (binary_search(arr, numb, low, mid - 1));
 		}
-		return 	binary_search(arr, numb,mid + 1,high);
+		return (binary_search(arr, numb, mid + 1, high));
 	}
-	return -1;
+	return (-1);
 }
 
-void tiny_sort(t_list **stack, char c)
+void	tiny_sort(t_list **stack, char c)
 {
-	int first;
-	int second;
-	int third;
+	int	first;
+	int	second;
+	int	third;
+
 	first = ((t_item *)(*stack)->content)->index;
 	second = ((t_item *)(*stack)->next->content)->index;
 	third = ((t_item *)(*stack)->next->next->content)->index;
 	if (first > second && first < third && second < third)
-		s(stack,c);
+		s(stack, c);
 	else if (first > second && first > third && second > third)
 	{
-		s(stack,c);
-		rr(stack,c);
+		s(stack, c);
+		rr(stack, c);
 	}
 	else if (first > second && first > third && second < third)
-		r(stack,c);
+		r(stack, c);
 	else if (first < second && first < third && second > third)
 	{
-		s(stack,c);
-		r(stack,c);
+		s(stack, c);
+		r(stack, c);
 	}
 	else if (first < second && first > third && second > third)
-		rr(stack,c); 
+		rr(stack, c);
 }

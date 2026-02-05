@@ -17,6 +17,7 @@ long	ft_atol(const char *str)
 	long	result;
 	int		sign;
 	int		i;
+
 	result = 0;
 	sign = 1;
 	i = 0;
@@ -39,6 +40,7 @@ long	ft_atol(const char *str)
 int	is_all_digits(char *s)
 {
 	char	*ptr;
+
 	ptr = s;
 	while (*ptr)
 	{
@@ -52,6 +54,7 @@ int	is_all_digits(char *s)
 int	is_number_in(long *array, int len, long number)
 {
 	int	i;
+
 	i = -1;
 	while (++i < len)
 	{
@@ -64,6 +67,7 @@ int	is_number_in(long *array, int len, long number)
 int	are_arrays_equal(long *arr1, long *arr2, int len)
 {
 	int	i;
+
 	i = -1;
 	while (++i < len)
 	{
@@ -76,6 +80,7 @@ int	are_arrays_equal(long *arr1, long *arr2, int len)
 int	is_array_in_int_range(long *arr, int len)
 {
 	int	i;
+
 	i = -1;
 	while (++i < len)
 	{
